@@ -19,6 +19,7 @@ import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.channel.unix.PeerCredentials;
 import io.netty.channel.unix.tests.SocketTest;
 import io.netty.channel.unix.tests.UnixTestUtils;
+import io.netty.util.NetUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 public class EpollSocketTest extends SocketTest<LinuxSocket> {
@@ -60,6 +62,36 @@ public class EpollSocketTest extends SocketTest<LinuxSocket> {
         } finally {
             s1.close();
             s2.close();
+        }
+    }
+
+    @Test
+    public void testJoinGroupWithIpv6Fails() throws IOException {
+        LinuxSocket socket = LinuxSocket.newSocketDgram();
+        try {
+            try {
+                socket.joinGroup(NetUtil.LOCALHOST6, NetUtil.LOOPBACK_IF, null);
+                fail();
+            } catch (IOException expected) {
+                // expected
+            }
+        } finally {
+            socket.close();
+        }
+    }
+
+    @Test
+    public void testLeaveGroupWithIpv6Fails() throws IOException {
+        LinuxSocket socket = LinuxSocket.newSocketDgram();
+        try {
+            try {
+                socket.leaveGroup(NetUtil.LOCALHOST6, NetUtil.LOOPBACK_IF, null);
+                fail();
+            } catch (IOException expected) {
+                // expected
+            }
+        } finally {
+            socket.close();
         }
     }
 
